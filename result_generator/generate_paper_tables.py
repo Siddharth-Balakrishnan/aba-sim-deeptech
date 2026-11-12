@@ -1,10 +1,13 @@
-"""Script to generate the 4 core publication data tables for the research paper.
+"""Table Generator for Deeptech Simulation Research Paper
 
-Output Tables (saved in repository root):
-1. table_1_descriptive_stats.csv
-2. table_2_abm_survival_milestones.csv
-3. table_3_nsga2_pareto_summary.csv
-4. table_4_elastic_net_stability.csv
+Generates the 4 core CSV data tables and saves them to:
+  result_generator/results/tables/
+
+Tables:
+  1. table_1_descriptive_stats.csv       - Baseline GUESSS metrics (Mean, SD, Median, Min, Max)
+  2. table_2_abm_survival_milestones.csv - Quarterly ABM milestone tracking
+  3. table_3_nsga2_pareto_summary.csv    - NSGA-II Pareto-optimal allocations summary
+  4. table_4_elastic_net_stability.csv   - Elastic Net stability selection frequencies & ranks
 """
 
 import os
@@ -13,16 +16,17 @@ import pandas as pd
 from sklearn.linear_model import ElasticNet
 from sklearn.preprocessing import StandardScaler
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(SCRIPT_DIR)
+OUTPUT_DIR = os.path.join(SCRIPT_DIR, "results", "tables")
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
-# ===================================================================
-# Table 1: Descriptive Statistics of Baseline Metrics
-# ===================================================================
+# ---------------------------------------------------------------------------
+# Table 1: Descriptive Statistics of Baseline Metrics (N=300)
+# ---------------------------------------------------------------------------
 def generate_table_1():
-    baseline_path = os.path.join(
-        ROOT_DIR, "guess_baseline_calibration", "outputs", "calibrated_agents_baseline.csv"
-    )
+    baseline_path = os.path.join(ROOT_DIR, "guess_baseline_calibration", "outputs", "calibrated_agents_baseline.csv")
     df_base = pd.read_csv(baseline_path)
 
     metrics_map = {
@@ -47,21 +51,19 @@ def generate_table_1():
         })
 
     table_1 = pd.DataFrame(records)
-    out_path = os.path.join(ROOT_DIR, "table_1_descriptive_stats.csv")
+    out_path = os.path.join(OUTPUT_DIR, "table_1_descriptive_stats.csv")
     table_1.to_csv(out_path, index=False)
-    print(f"✓ Table 1 saved to: {out_path}")
+    print(f"  ✓ Saved Table 1: {out_path}")
     print(table_1.to_string(index=False))
     print()
     return table_1
 
 
-# ===================================================================
-# Table 2: Longitudinal ABM Survival Milestones (Quarterly)
-# ===================================================================
+# ---------------------------------------------------------------------------
+# Table 2: Longitudinal ABM Survival Milestones (Quarterly Tracking)
+# ---------------------------------------------------------------------------
 def generate_table_2():
-    abm_path = os.path.join(
-        ROOT_DIR, "abm_simulation", "outputs", "abm_longitudinal_data.csv"
-    )
+    abm_path = os.path.join(ROOT_DIR, "abm_simulation", "outputs", "abm_longitudinal_data.csv")
     df_abm = pd.read_csv(abm_path)
 
     quarters = [
@@ -94,21 +96,19 @@ def generate_table_2():
         })
 
     table_2 = pd.DataFrame(records)
-    out_path = os.path.join(ROOT_DIR, "table_2_abm_survival_milestones.csv")
+    out_path = os.path.join(OUTPUT_DIR, "table_2_abm_survival_milestones.csv")
     table_2.to_csv(out_path, index=False)
-    print(f"✓ Table 2 saved to: {out_path}")
+    print(f"  ✓ Saved Table 2: {out_path}")
     print(table_2.to_string(index=False))
     print()
     return table_2
 
 
-# ===================================================================
+# ---------------------------------------------------------------------------
 # Table 3: NSGA-II Pareto Front Summary
-# ===================================================================
+# ---------------------------------------------------------------------------
 def generate_table_3():
-    pareto_path = os.path.join(
-        ROOT_DIR, "optimization_and_ml", "outputs", "pareto_optimal_allocations.csv"
-    )
+    pareto_path = os.path.join(ROOT_DIR, "optimization_and_ml", "outputs", "pareto_optimal_allocations.csv")
     df_pareto = pd.read_csv(pareto_path)
 
     dimensions = [
@@ -131,29 +131,24 @@ def generate_table_3():
         })
 
     table_3 = pd.DataFrame(records)
-    out_path = os.path.join(ROOT_DIR, "table_3_nsga2_pareto_summary.csv")
+    out_path = os.path.join(OUTPUT_DIR, "table_3_nsga2_pareto_summary.csv")
     table_3.to_csv(out_path, index=False)
-    print(f"✓ Table 3 saved to: {out_path}")
+    print(f"  ✓ Saved Table 3: {out_path}")
     print(table_3.to_string(index=False))
     print()
     return table_3
 
 
-# ===================================================================
+# ---------------------------------------------------------------------------
 # Table 4: Elastic Net Stability Selection Metrics
-# ===================================================================
+# ---------------------------------------------------------------------------
 def generate_table_4():
-    abm_path = os.path.join(
-        ROOT_DIR, "abm_simulation", "outputs", "abm_longitudinal_data.csv"
-    )
-    baseline_path = os.path.join(
-        ROOT_DIR, "guess_baseline_calibration", "outputs", "calibrated_agents_baseline.csv"
-    )
+    abm_path = os.path.join(ROOT_DIR, "abm_simulation", "outputs", "abm_longitudinal_data.csv")
+    baseline_path = os.path.join(ROOT_DIR, "guess_baseline_calibration", "outputs", "calibrated_agents_baseline.csv")
 
     df_abm = pd.read_csv(abm_path)
     df_baseline = pd.read_csv(baseline_path)
 
-    # Extract final state per agent
     def get_final(group):
         b = group[group["is_burned_out"]]
         if not b.empty:
@@ -167,7 +162,6 @@ def generate_table_4():
     )
     df_final = df_final.merge(df_baseline[["Agent_ID", "lab_to_mvp_efficacy"]], on="Agent_ID")
 
-    # Interaction term
     df_final["efficacy_x_exposure"] = (
         df_final["lab_to_mvp_efficacy"]
         * (1.0 / df_final["deeptech_resilience"].clip(lower=0.01))
@@ -201,7 +195,6 @@ def generate_table_4():
     selection_pct = selected_matrix.mean(axis=0) * 100.0
     mean_coef = coef_matrix.mean(axis=0)
 
-    # Compile table
     records = []
     for idx, (col, display_name, ftype) in enumerate(features):
         records.append({
@@ -217,23 +210,24 @@ def generate_table_4():
     table_4.insert(0, "Stability_Rank", range(1, len(table_4) + 1))
     table_4 = table_4.drop(columns=["_sort_key"])
 
-    out_path = os.path.join(ROOT_DIR, "table_4_elastic_net_stability.csv")
+    out_path = os.path.join(OUTPUT_DIR, "table_4_elastic_net_stability.csv")
     table_4.to_csv(out_path, index=False)
-    print(f"✓ Table 4 saved to: {out_path}")
+    print(f"  ✓ Saved Table 4: {out_path}")
     print(table_4.to_string(index=False))
     print()
     return table_4
 
 
 def main():
-    print("=" * 70)
-    print("Generating Core Research Paper Data Tables (CSV)")
-    print("=" * 70)
+    print("=" * 65)
+    print("Generating All Publication Tables (Table 1 – Table 4)")
+    print(f"Output Directory: {OUTPUT_DIR}/")
+    print("=" * 65)
     generate_table_1()
     generate_table_2()
     generate_table_3()
     generate_table_4()
-    print("✅ All 4 publication tables have been successfully generated in root.")
+    print("\n✅ All 4 publication tables generated successfully.")
 
 
 if __name__ == "__main__":

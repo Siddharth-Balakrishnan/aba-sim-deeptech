@@ -43,3 +43,6 @@ optimization_and_ml/outputs/*.csv
 optimization_and_ml/outputs/*.parquet
 **/outputs/*.png
 **/outputs/**/*.png
+
+# Result generator outputs
+result_generator/results/
