@@ -39,20 +39,19 @@ This codebase provides an end-to-end computational pipeline that:
 
 ## Simulation Pipeline Architecture
 
-```mermaid
-graph TD
-    A["GUESSS Survey Baselines"] -->|Sampling| B["Module 1: Baseline Calibration"]
-    B -->|Initialize| C["Module 2: Mesa ABM Simulation"]
-    C -->|52-Week Runs| D["ABM Longitudinal Data"]
-    D --> E["Module 3: Optimization and ML"]
-    E -->|Elastic Net| F["Stability Selection"]
-    E -->|NSGA-II| G["Pareto Allocations"]
-    D --> H["Module 4: Result Generator"]
-    F --> H
-    G --> H
-    H --> I["Publication Figures (Fig 1 - 6)"]
-    H --> J["Structured Tables (Table 1 - 4)"]
-```
+<p align="center">
+  <img src="docs/pipeline_architecture.png" alt="Simulation Pipeline Architecture" width="950" />
+</p>
+
+### Pipeline Dataflow Specification
+
+| Stage | Input Artifact / Source | Processing & Methods | Output Artifact | Key Variables & Output Metrics |
+| :--- | :--- | :--- | :--- | :--- |
+| **Stage 1: Calibration** | GUESSS survey statistical baselines ($\mu, \sigma, \rho=0.35$) | Multivariate normal sampling & trait clipping (`[1.0, 7.0]`) | `calibrated_agents_baseline.csv` | 300 student founders (`GEI, LOC, IS, R, E, CB`) |
+| **Stage 2: ABM Simulation** | Calibrated agent profiles ($N=300$) | 52-week iterative Mesa simulation with stochastic shocks (10%) and academic decay (30 pts/wk) | `abm_longitudinal_data.csv` | 7,800 panel rows (`Week, Agent_ID, T_tech, T_mkt, A_score, R, is_burned_out`) |
+| **Stage 3A: Elastic Net ML** | Final-state agent records ($N=300$) | 100-bootstrap stability selection with non-linear interaction term | Selection frequencies & coefficients | Proves `Efficacy x Exposure` interaction dominance |
+| **Stage 3B: NSGA-II MOO** | Founder resource optimization problem | Non-dominated Sorting Genetic Algorithm II (Pop=100, Gen=50) | `pareto_optimal_allocations.csv` | Pareto frontier (`T_tech, T_mkt, T_acad`) under $T_{\mathrm{acad}} \ge 40\%$ |
+| **Stage 4: Results Export** | Simulation panels & optimization outputs | High-resolution rendering (300 DPI) & statistical tabulation | `results/graphs/`<br/>`results/tables/` | 6 publication figures (`fig1`–`fig6`) & 4 CSV tables (`table_1`–`table_4`) |
 
 ---
 
