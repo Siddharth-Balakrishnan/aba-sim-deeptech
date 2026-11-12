@@ -40,18 +40,18 @@ This codebase provides an end-to-end computational pipeline that:
 ## Simulation Pipeline Architecture
 
 ```mermaid
-flowchart TD
-    A["GUESSS Survey STEM Baselines<br/>(Means, Covariances)"] -->|Multivariate Normal Sampling| B["Module 1: guess_baseline_calibration<br/>calibrated_agents_baseline.csv (N=300)"]
-    B -->|Agent Initialization| C["Module 2: abm_simulation (Mesa)<br/>52-Week Cycle with Cognitive Allocation & Shocks"]
-    C -->|Longitudinal Tracking| D["abm_longitudinal_data.csv<br/>(Trajectories, Burnout States)"]
-    D --> E["Module 3: optimization_and_ml<br/>analyze.py"]
-    E -->|Elastic Net Stability - 100 Bootstraps| F["Feature Stability Ranks<br/>(Efficacy x Exposure Interaction)"]
-    E -->|NSGA-II Pareto Optimization| G["pareto_optimal_allocations.csv<br/>(Optimal Trade-off Policies)"]
-    D --> H["Module 4: result_generator<br/>run_all.py"]
+graph TD
+    A["GUESSS Survey Baselines"] -->|Sampling| B["Module 1: Baseline Calibration"]
+    B -->|Initialize| C["Module 2: Mesa ABM Simulation"]
+    C -->|52-Week Runs| D["ABM Longitudinal Data"]
+    D --> E["Module 3: Optimization and ML"]
+    E -->|Elastic Net| F["Stability Selection"]
+    E -->|NSGA-II| G["Pareto Allocations"]
+    D --> H["Module 4: Result Generator"]
     F --> H
     G --> H
-    H --> I["results/graphs/<br/>6 Publication Figures (300 DPI)"]
-    H --> J["results/tables/<br/>4 Structured CSV Data Tables"]
+    H --> I["Publication Figures (Fig 1 - 6)"]
+    H --> J["Structured Tables (Table 1 - 4)"]
 ```
 
 ---
