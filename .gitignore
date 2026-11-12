@@ -1,0 +1,43 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+
+# Distribution / packaging
+*.egg
+*.egg-info/
+dist/
+build/
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environments
+venv/
+.env/
+ENV/
+env/
+virtualenv/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Data outputs
+outputs/*.csv
+outputs/*.parquet
+**/outputs/*.csv
+**/outputs/*.parquet
+
+abm_simulation/outputs/*.csv
+abm_simulation/outputs/*.parquet
+
+optimization_and_ml/outputs/*.csv
+optimization_and_ml/outputs/*.parquet
