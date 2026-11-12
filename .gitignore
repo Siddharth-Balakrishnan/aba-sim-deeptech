@@ -41,3 +41,5 @@ abm_simulation/outputs/*.parquet
 
 optimization_and_ml/outputs/*.csv
 optimization_and_ml/outputs/*.parquet
+**/outputs/*.png
+**/outputs/**/*.png
